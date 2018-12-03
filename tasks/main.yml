@@ -1,0 +1,29 @@
+---
+
+- name: install yum-plugin-fastestmirror
+  yum: name=yum-plugin-fastestmirror state=latest
+
+- name: install el key
+  command: rpm --import https://www.elrepo.org/RPM-GPG-KEY-elrepo.org
+
+- name: install el repo
+  yum: name=https://www.elrepo.org/elrepo-release-7.0-3.el7.elrepo.noarch.rpm state=latest
+
+- name: install the kernel
+  yum: name=kernel-ml enablerepo=elrepo-kernel state=latest
+
+- name: echo the grub
+  shell: awk -F\' '$1=="menuentry " {print i++ " * " $2}' /etc/grub2.cfg
+  register: foo
+
+- name: print the kernel info
+  debug: msg=the echo was {{ foo.stdout }}
+
+- name: set the kernel menu
+  command: grub2-set-default 0
+
+- name: set the grub config
+  command: grub2-mkconfig -o /boot/grub2/grub.cfg
+
+- name: reboot the machine
+  reboot:

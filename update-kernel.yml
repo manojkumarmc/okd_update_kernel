@@ -1,0 +1,4 @@
+---
+- hosts: cnodes
+  roles:
+    - kernel
